@@ -66,9 +66,12 @@ df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
 df = df.dropna(subset=["timestamp"]).copy()
 
 # Duration handling (seconds -> minutes for display)
-if "duration" in df.columns:
-    df["duration"] = pd.to_numeric(df["duration"], errors="coerce")
-    df["duration_minutes"] = df["duration"] / 60.0
+if "minutes" in df.columns:
+    df["duration_seconds"] = pd.to_numeric(df["minutes"], errors="coerce")
+    df["duration_minutes"] = df["duration_seconds"] / 60.0
+elif "duration" in df.columns:
+    df["duration_seconds"] = pd.to_numeric(df["duration"], errors="coerce")
+    df["duration_minutes"] = df["duration_seconds"] / 60.0
 else:
     df["duration_minutes"] = np.nan
 
@@ -132,7 +135,7 @@ active_branches = int(filtered["branch"].nunique()) if not filtered.empty else 0
 
 c1, c2, c3, c4, c5 = st.columns(5)
 c1.metric("Total Runs", f"{total_runs:,}")
-c2.metric("Total Minutes", f"{total_minutes:,.1f} min" if not np.isnan(total_minutes) else "N/A")
+c2.metric("Total Minutes", f"{total_minutes:,.0f} min" if not np.isnan(total_minutes) else "N/A")
 c3.metric("Avg Duration/Call", f"{avg_minutes:,.2f} min" if not np.isnan(avg_minutes) else "N/A")
 c4.metric("Active Workflows", f"{active_workflows:,}")
 c5.metric("Active Branches", f"{active_branches:,}")
